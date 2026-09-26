@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RDU flights by Vinny" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUkRVIGZsaWdodHMgYnkgVmlubnkiLCJzaG9ydF9uYW1lIjoiUkRVIGJ5IFZpbm55Iiwic3RhcnRfdXJsIjoiLiIsInRoZW1lX2NvbG9yIjoiIzBmMTcyYSIsImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMTAwIDEwMCclM0UlM0NyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJyByeD0nMjAnIGZpbGw9JyUyMzI1NjNlYicvJTNFJTNDdGV4dCB4PSc1MCcgeT0nNjInIGZvbnQtc2l6ZT0nNDAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9J3doaXRlJyUzRSVFMiU5QyU4OCUzQy90ZXh0JTNFJTNDL3N2ZyUzRSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==" />
+  <title>RDU flights by Vinny</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --info: #0891b2;
+      --shadow: 0 1px 3px rgba(0,0,0,.08);
+      --radius: 12px;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #22d3ee;
+      --shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo span { color: var(--accent); }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    button, select, input {
+      font: inherit;
+      color: var(--text);
+    }
+    .icon-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
+      font-size: 1.1rem;
+    }
+    .icon-btn:hover { background: var(--border); }
+    .icon-btn:active { transform: scale(.96); }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .tab {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: .9rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all .15s;
+    }
+    .tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    @media (min-width: 640px) {
+      .filters { grid-template-columns: repeat(4, 1fr); }
+    }
+    .filter-group label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    select, input[type="search"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      font-size: .9rem;
+    }
+    select:focus, input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: -1px;
+    }
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 10px 16px;
+      font-size: .8rem;
+      color: var(--text-muted);
+      align-items: center;
+    }
+    .meta-bar .count { font-weight: 600; color: var(--text); }
+    .refresh-info { margin-left: auto; }
+    main {
+      padding: 8px 12px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .flight-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px 12px;
+      align-items: start;
+      transition: border-color .15s;
+    }
+    .flight-card:hover { border-color: var(--accent); }
+    .time-col {
+      text-align: center;
+      min-width: 64px;
+    }
+    .time-main {
+      font-weight: 700;
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .time-sched {
+      font-size: .75rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .time-updated {
+      font-size: .65rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .flight-info { min-width: 0; }
+    .route {
+      font-weight: 600;
+      font-size: .95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .flight-meta {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+    }
+    .status-col {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .badge-on-time, .badge-scheduled { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+    .badge-landed, .badge-departed { background: color-mix(in srgb, var(--info) 18%, transparent); color: var(--info); }
+    .badge-delayed { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
+    .badge-canceled { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+    .gate {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .empty, .loading, .error-box {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-muted);
+    }
+    .loading { animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .5; } }
+    .error-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 520px;
+      margin: 24px auto;
+      text-align: left;
+    }
+    .error-box h2 {
+      font-size: 1.1rem;
+      color: var(--danger);
+      margin-bottom: 8px;
+    }
+    .error-box p, .error-box li {
+      font-size: .9rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .error-box ol { padding-left: 1.3em; margin-bottom: 12px; }
+    .error-box code {
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .85em;
+    }
+    .error-box .hint {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+    #installBanner {
+      display: none;
+      background: var(--accent);
+      color: white;
+      padding: 10px 16px;
+      text-align: center;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #installBanner.show { display: block; }
+    @media (max-width: 400px) {
+      .flight-card { grid-template-columns: 1fr auto; }
+      .time-col { grid-column: 1 / -1; display: flex; gap: 12px; align-items: baseline; text-align: left; }
+      .time-updated { margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="installBanner">📲 Tap here to Add to Home Screen</div>
+
+  <header>
+    <div class="header-top">
+      <div class="logo">✈ <span>RDU</span> flights by Vinny</div>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" title="Refresh" aria-label="Refresh">↻</button>
+        <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">☾</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-scope="all">All</button>
+      <button class="tab" data-scope="departure">Departures</button>
+      <button class="tab" data-scope="arrival">Arrivals</button>
+    </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label for="airlineFilter">Airline</label>
+        <select id="airlineFilter"><option value="">All airlines</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="terminalFilter">Terminal</label>
+        <select id="terminalFilter">
+          <option value="">All terminals</option>
+          <option value="1">Terminal 1</option>
+          <option value="2">Terminal 2</option>
+          <option value="unknown">Unknown / Other</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="updatedFilter">Updated</label>
+        <select id="updatedFilter">
+          <option value="">Any time</option>
+          <option value="5">Last 5 min</option>
+          <option value="15">Last 15 min</option>
+          <option value="30">Last 30 min</option>
+          <option value="60">Last hour</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="searchFilter">Search</label>
+        <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
+      </div>
+    </div>
+  </header>
+
+  <div class="meta-bar">
+    <span>Showing <span class="count" id="shownCount">0</span> of <span class="count" id="totalCount">0</span></span>
+    <span class="refresh-info" id="lastRefresh">—</span>
+  </div>
+
+  <main id="list">
+    <div class="loading">Loading flights…</div>
+  </main>
+
+  <footer>
+    RDU flights by Vinny · Data from RDU official API · Auto-refreshes every 60s
+  </footer>
+
+  <script>
+    // ★★★ PASTE YOUR CLOUDFLARE WORKER URL HERE ★★★
+    // Example: 'https://rdu-flights-proxy.yourname.workers.dev'
+    const PROXY_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
+
+    // Do not change the line below
+    const BASE = PROXY_URL.replace(/\/$/, '');
+
+    // RDU: Terminal 1 ≈ A gates, Terminal 2 ≈ C & D gates
+    function deriveTerminal(gate) {
+      if (!gate) return 'unknown';
+      const g = String(gate).toUpperCase();
+      if (g.startsWith('A')) return '1';
+      if (g.startsWith('C') || g.startsWith('D') || g.startsWith('B')) return '2';
+      return 'unknown';
+    }
+
+    function terminalLabel(t) {
+      if (t === '1') return 'T1';
+      if (t === '2') return 'T2';
+      return '—';
+    }
+
+    let allFlights = [];
+    let scope = 'all';
+    let deferredPrompt = null;
+
+    const $ = (sel) => document.querySelector(sel);
+    const listEl = $('#list');
+    const airlineSelect = $('#airlineFilter');
+    const terminalSelect = $('#terminalFilter');
+    const updatedSelect = $('#updatedFilter');
+    const searchInput = $('#searchFilter');
+
+    // ——— Theme ———
+    const themeBtn = $('#themeBtn');
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      themeBtn.textContent = theme === 'dark' ? '☀' : '☾';
+      localStorage.setItem('rdu-theme', theme);
+    }
+    applyTheme(localStorage.getItem('rdu-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+    // ——— Tabs & filters ———
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        scope = btn.dataset.scope;
+        render();
+      });
+    });
+    [airlineSelect, terminalSelect, updatedSelect].forEach(el => el.addEventListener('change', render));
+    searchInput.addEventListener('input', debounce(render, 200));
+    $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
+
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    }
+
+    function formatTime(ts) {
+      if (!ts) return '—';
+      return new Date(ts * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function formatRelative(ts) {
+      if (!ts) return '';
+      const diff = Math.round((Date.now() / 1000) - ts);
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return formatTime(ts);
+    }
+
+    function statusClass(status, isDelayed) {
+      const s = (status || '').toLowerCase();
+      if (s === 'canceled' || s === 'cancelled') return 'badge-canceled';
+      if (s === 'landed' || s === 'arrived') return 'badge-landed';
+      if (s === 'departed') return 'badge-departed';
+      if (isDelayed || s === 'delayed') return 'badge-delayed';
+      if (s === 'scheduled' || s === 'on time') return 'badge-scheduled';
+      return 'badge-on-time';
+    }
+
+    function statusLabel(f) {
+      if (f.isDelayed && !['Landed','Departed','Canceled'].includes(f.status)) return 'Delayed';
+      return f.status || '—';
+    }
+
+    function showCorsHelp(errMsg) {
+      const isFile = location.protocol === 'file:';
+      listEl.innerHTML = `
+        <div class="error-box">
+          <h2>Could not load flight data</h2>
+          <p><strong>Reason:</strong> ${errMsg || 'Network or CORS error'}</p>
+          ${isFile ? `
+            <p>You opened this file directly (<code>file://</code>). Browsers block API calls from local files for security.</p>
+            <p><strong>Quick fix — run a local server:</strong></p>
+            <ol>
+              <li>Open a terminal in the folder that contains this file.</li>
+              <li>Run: <code>python3 -m http.server 8000</code></li>
+              <li>Open <code>http://localhost:8000/RDU-flights-by-Vinny.html</code> in your browser.</li>
+            </ol>
+          ` : `
+            <p>The RDU API does not allow requests from this origin (CORS). Serve this page from a local server or a static host.</p>
+            <p><strong>Easiest local option:</strong></p>
+            <ol>
+              <li>In the folder with this file run: <code>python3 -m http.server 8000</code></li>
+              <li>Visit <code>http://localhost:8000/RDU-flights-by-Vinny.html</code></li>
+            </ol>
+          `}
+          <p class="hint">Once it is served over <code>http://</code> or <code>https://</code>, the “Add to Home Screen” option will also work on phones.</p>
+          <p style="margin-top:12px"><button class="icon-btn" style="width:auto;padding:8px 16px" onclick="fetchFlights(true)">Try again</button></p>
+        </div>`;
+    }
+
+    async function fetchFlights(manual = false) {
+      if (manual) listEl.innerHTML = '<div class="loading">Refreshing…</div>';
+
+      // Safety check – user still needs to paste their Worker URL
+      if (BASE.includes('YOUR-WORKER-NAME') || BASE.includes('YOUR-SUBDOMAIN')) {
+        listEl.innerHTML = `
+          <div class="error-box">
+            <h2>Proxy not configured yet</h2>
+            <p>Open this file and replace the <code>PROXY_URL</code> value near the top of the script with the URL of your Cloudflare Worker.</p>
+            <p>It should look something like:<br><code>https://rdu-flights-proxy.yourname.workers.dev</code></p>
+          </div>`;
+        return;
+      }
+
+      const now = Math.floor(Date.now() / 1000);
+      const from = now - 12 * 3600;
+      const to = now + 18 * 3600;
+      const url = `${BASE}?scheduledTimestamp=${from}..${to}`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (json.status && json.status.code && json.status.code !== 200) {
+          throw new Error(json.status.message || 'API error');
+        }
+        allFlights = (json.data?.flights || [])
+          .filter(f => f.isVisible !== false && !f.isDeleted)
+          .map(f => ({
+            ...f,
+            terminal: deriveTerminal(f.gate),
+            displayTime: f.bestKnownTimestamp || f.estimatedTimestamp || f.actualTimestamp || f.scheduledTimestamp,
+            isArrival: !!f.arrival
+          }))
+          .sort((a, b) => a.displayTime - b.displayTime);
+
+        populateAirlines();
+        $('#lastRefresh').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+        render();
+      } catch (err) {
+        console.error(err);
+        const msg = (err && err.message) || String(err);
+        listEl.innerHTML = `
+          <div class="error-box">
+            <h2>Could not load flight data</h2>
+            <p><strong>Reason:</strong> ${msg}</p>
+            <p>Check that your Cloudflare Worker is deployed and that the <code>PROXY_URL</code> in this file is correct.</p>
+            <p style="margin-top:12px">
+              <button class="icon-btn" style="width:auto;padding:8px 16px" onclick="fetchFlights(true)">Try again</button>
+            </p>
+          </div>`;
+      }
+    }
+
+    function populateAirlines() {
+      const current = airlineSelect.value;
+      const airlines = [...new Set(allFlights.map(f => f.iataOperatingAirline).filter(Boolean))].sort();
+      airlineSelect.innerHTML = '<option value="">All airlines</option>' +
+        airlines.map(a => `<option value="${a}">${a}</option>`).join('');
+      airlineSelect.value = current;
+    }
+
+    function render() {
+      const airline = airlineSelect.value;
+      const terminal = terminalSelect.value;
+      const updatedMins = parseInt(updatedSelect.value, 10) || 0;
+      const q = searchInput.value.trim().toLowerCase();
+      const nowSec = Math.floor(Date.now() / 1000);
+
+      let filtered = allFlights.filter(f => {
+        if (scope === 'departure' && f.isArrival) return false;
+        if (scope === 'arrival' && !f.isArrival) return false;
+        if (airline && f.iataOperatingAirline !== airline) return false;
+        if (terminal && f.terminal !== terminal) return false;
+        if (updatedMins && (!f.lastUpdatedTimestamp || (nowSec - f.lastUpdatedTimestamp) > updatedMins * 60)) return false;
+        if (q) {
+          const hay = [
+            f.iataOperatingAirlineFlightNumber,
+            f.codeShareFlightNumber,
+            f.departureAirport,
+            f.arrivalAirport,
+            f.gate,
+            f.status,
+            f.iataOperatingAirline
+          ].join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      $('#shownCount').textContent = filtered.length;
+      $('#totalCount').textContent = allFlights.length;
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="empty">No flights match your filters.</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(f => {
+        const dest = f.isArrival ? f.departureAirport : f.arrivalAirport;
+        const sched = f.scheduledTimestamp;
+        const best = f.displayTime;
+        const showCorrection = best && sched && best !== sched;
+        const badgeCls = statusClass(f.status, f.isDelayed);
+        const label = statusLabel(f);
+
+        return `
+          <article class="flight-card">
+            <div class="time-col">
+              <div class="time-main">${formatTime(best)}</div>
+              ${showCorrection ? `<div class="time-sched">${formatTime(sched)}</div>` : ''}
+              <div class="time-updated" title="Last updated">${formatRelative(f.lastUpdatedTimestamp)}</div>
+            </div>
+            <div class="flight-info">
+              <div class="route">${f.isArrival ? '←' : '→'} ${dest || '—'} · ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
+              <div class="flight-meta">
+                <span>${f.iataOperatingAirline || ''}</span>
+                <span>${terminalLabel(f.terminal)}${f.gate ? ' · Gate ' + f.gate : ''}</span>
+                ${f.isArrival && f.baggageBelt?.length ? `<span>Bag ${f.baggageBelt.join(',')}</span>` : ''}
+              </div>
+            </div>
+            <div class="status-col">
+              <span class="badge ${badgeCls}">${label}</span>
+              ${f.gate ? `<span class="gate">${f.gate}</span>` : ''}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // ——— PWA / Add to Home Screen ———
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      $('#installBanner').classList.add('show');
+    });
+
+    $('#installBanner').addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        alert('To add to Home Screen:\\n\\n• iPhone/iPad: Tap the Share button → “Add to Home Screen”\\n• Android: Use the browser menu → “Install app” or “Add to Home screen”');
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') $('#installBanner').classList.remove('show');
+      deferredPrompt = null;
+    });
+
+    // Minimal service worker (only works when served over http/https)
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      const swCode = `
+        const CACHE = 'rdu-flights-v1';
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(self.clients.claim());
+        });
+        self.addEventListener('fetch', e => {
+          if (e.request.url.includes('framna-rdu.cloud')) {
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+            return;
+          }
+          e.respondWith(
+            caches.match(e.request).then(r => r || fetch(e.request))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
+
+    // Initial load + auto-refresh
+    fetchFlights();
+    setInterval(() => fetchFlights(false), 60_000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') fetchFlights(false);
+    });
+  </script>
+</body>
+</html>
