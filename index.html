@@ -1,3 +1,64 @@
+Skip to main content
+great but have the trail curving from behind RDU on the left, arching toward the upper left corner and ending where the current plane is
+
+
+Worked for 19s
+Updating the trail so it starts behind RDU on the left and curves up to the plane.
+
+Generated image
+OK. Lets us that as the badge for the page now.
+
+
+Worked for 49s
+Updated. The page header now uses that badge design:
+
+Rounded blue gradient square
+Plane in the upper right, climbing
+Trail starting from the left (behind the RDU area) and curving up to the plane
+RDU and — by Vinny —
+Flight Status title to the right
+To go live
+Re-upload the HTML to your GitHub repo (or edit and commit there).
+
+Updated file:
+
+the badge cut off the plane.  can you redo it with the trail following a 'C' path to the plane?  Make sure that the plane if visible in the badge.
+
+
+Worked for 58s
+Updated. The badge now has:
+
+A C-shaped trail starting on the left, curving down and around, then up to the plane
+The plane fully visible in the upper-right (scaled and positioned inside the badge)
+Slightly more padding so nothing gets clipped
+To go live
+Re-upload the HTML to GitHub (or edit and commit there).
+
+Updated file:
+
+If the C-curve should open the other way or the plane needs to sit a bit higher/lower, tell me and I’ll adjust.
+
+ok, let's add the badge to the header like before but lets reference the .jpg file directly.  I want to use the hN7UD.jpg file please.
+
+
+Worked for 48s
+Done. The header now uses hN7UD.jpg as the badge, with Flight Status beside it.
+
+Files to upload to GitHub (same folder)
+Generated image
+Both must be in the same directory on GitHub Pages so src="hN7UD.jpg" resolves correctly.
+
+After you upload/commit both, refresh the live site and the badge should appear.
+
+
+
+
+
+RDU-flights-by-Vinny.html
+
+
+
+Files
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,13 +128,39 @@
       margin-bottom: 12px;
     }
     .logo {
-      font-weight: 700;
-      font-size: 1.15rem;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
     }
-    .logo span { color: var(--accent); }
+    .logo-badge {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4);
+      overflow: hidden;
+      display: block;
+    }
+    .logo-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.2;
+    }
+    .logo-text .title {
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
     .header-actions {
       display: flex;
       gap: 8px;
@@ -312,7 +399,14 @@
 
   <header>
     <div class="header-top">
-      <div class="logo">✈ <span>RDU</span> flights by Vinny</div>
+      <div class="logo" aria-label="RDU flights by Vinny — Flight Status">
+        <div class="logo-badge" aria-hidden="true">
+          <img src="hN7UD.jpg" alt="RDU flights by Vinny" width="88" height="88" />
+        </div>
+        <div class="logo-text">
+          <div class="title">Flight Status</div>
+        </div>
+      </div>
       <div class="header-actions">
         <button class="icon-btn" id="refreshBtn" title="Refresh" aria-label="Refresh">↻</button>
         <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">☾</button>
@@ -386,7 +480,7 @@
   <script>
     // ★★★ PASTE YOUR CLOUDFLARE WORKER URL HERE ★★★
     // Example: 'https://rdu-flights-proxy.yourname.workers.dev'
-    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev/';
+    const PROXY_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
 
     // Do not change the line below
     const BASE = PROXY_URL.replace(/\/$/, '');
@@ -727,3 +821,4 @@
   </script>
 </body>
 </html>
+Flight Status Filter App Builder - Grok
