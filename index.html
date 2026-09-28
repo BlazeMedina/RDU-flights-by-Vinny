@@ -129,7 +129,10 @@
       margin-top: 12px;
     }
     @media (min-width: 640px) {
-      .filters { grid-template-columns: repeat(4, 1fr); }
+      .filters { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 900px) {
+      .filters { grid-template-columns: repeat(5, 1fr); }
     }
     .filter-group label {
       display: block;
@@ -345,6 +348,14 @@
         </select>
       </div>
       <div class="filter-group">
+        <label for="sortFilter">Sort by</label>
+        <select id="sortFilter">
+          <option value="scheduled">Scheduled time</option>
+          <option value="best">Best known time</option>
+          <option value="updated">Most recently updated</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label for="searchFilter">Search</label>
         <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
       </div>
@@ -367,7 +378,7 @@
   <script>
     // ★★★ PASTE YOUR CLOUDFLARE WORKER URL HERE ★★★
     // Example: 'https://rdu-flights-proxy.yourname.workers.dev'
-    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev/';
+    const PROXY_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
 
     // Do not change the line below
     const BASE = PROXY_URL.replace(/\/$/, '');
@@ -396,6 +407,7 @@
     const airlineSelect = $('#airlineFilter');
     const terminalSelect = $('#terminalFilter');
     const updatedSelect = $('#updatedFilter');
+    const sortSelect = $('#sortFilter');
     const searchInput = $('#searchFilter');
 
     // ——— Theme ———
@@ -420,7 +432,7 @@
         render();
       });
     });
-    [airlineSelect, terminalSelect, updatedSelect].forEach(el => el.addEventListener('change', render));
+    [airlineSelect, terminalSelect, updatedSelect, sortSelect].forEach(el => el.addEventListener('change', render));
     searchInput.addEventListener('input', debounce(render, 200));
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
 
@@ -551,6 +563,7 @@
       const airline = airlineSelect.value;
       const terminal = terminalSelect.value;
       const updatedMins = parseInt(updatedSelect.value, 10) || 0;
+      const sortBy = sortSelect.value || 'scheduled';
       const q = searchInput.value.trim().toLowerCase();
       const nowSec = Math.floor(Date.now() / 1000);
 
@@ -573,6 +586,20 @@
           if (!hay.includes(q)) return false;
         }
         return true;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        if (sortBy === 'updated') {
+          // Most recently updated first
+          return (b.lastUpdatedTimestamp || 0) - (a.lastUpdatedTimestamp || 0);
+        }
+        if (sortBy === 'best') {
+          // Best known / estimated / actual time
+          return (a.displayTime || 0) - (b.displayTime || 0);
+        }
+        // Default: original scheduled time
+        return (a.scheduledTimestamp || 0) - (b.scheduledTimestamp || 0);
       });
 
       $('#shownCount').textContent = filtered.length;
