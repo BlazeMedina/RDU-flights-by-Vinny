@@ -76,14 +76,19 @@
     .logo-badge {
       width: 112px;
       height: 112px;
-      object-fit: cover;
-      padding: 0; /* Removes internal white space */
+      border-radius: 26px;
+      flex-shrink: 0;
+      box-shadow:
+        0 2px 4px rgba(15, 23, 42, 0.12),
+        0 8px 20px rgba(29, 78, 216, 0.35),
+        0 16px 32px rgba(15, 23, 42, 0.18);
+      overflow: hidden;
+      display: block;
     }
     .logo-badge img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      margin: 0; /* Removes external image space */
       display: block;
     }
     .logo-text {
@@ -338,7 +343,7 @@
     <div class="header-top">
       <div class="logo" aria-label="RDU flights by Vinny — Flight Status">
         <div class="logo-badge" aria-hidden="true">
-          <img src="hN7UD.jpg" alt="RDU flights by Vinny" width="88" height="88" />
+          <img src="hN7UD.jpg" alt="RDU flights by Vinny" width="112" height="112" />
         </div>
         <div class="logo-text">
           <div class="title">Flight Status</div>
@@ -758,4 +763,3 @@
   </script>
 </body>
 </html>
-Flight Status Filter App Builder - Grok
