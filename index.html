@@ -132,7 +132,7 @@
       .filters { grid-template-columns: repeat(3, 1fr); }
     }
     @media (min-width: 900px) {
-      .filters { grid-template-columns: repeat(5, 1fr); }
+      .filters { grid-template-columns: repeat(6, 1fr); }
     }
     .filter-group label {
       display: block;
@@ -325,6 +325,14 @@
     </div>
     <div class="filters">
       <div class="filter-group">
+        <label for="dayFilter">Day</label>
+        <select id="dayFilter">
+          <option value="yesterday">Yesterday</option>
+          <option value="today" selected>Today</option>
+          <option value="tomorrow">Tomorrow</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label for="airlineFilter">Airline</label>
         <select id="airlineFilter"><option value="">All airlines</option></select>
       </div>
@@ -404,6 +412,7 @@
 
     const $ = (sel) => document.querySelector(sel);
     const listEl = $('#list');
+    const daySelect = $('#dayFilter');
     const airlineSelect = $('#airlineFilter');
     const terminalSelect = $('#terminalFilter');
     const updatedSelect = $('#updatedFilter');
@@ -432,7 +441,7 @@
         render();
       });
     });
-    [airlineSelect, terminalSelect, updatedSelect, sortSelect].forEach(el => el.addEventListener('change', render));
+    [daySelect, airlineSelect, terminalSelect, updatedSelect, sortSelect].forEach(el => el.addEventListener('change', render));
     searchInput.addEventListener('input', debounce(render, 200));
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
 
@@ -453,6 +462,25 @@
       if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
       if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
       return formatTime(ts);
+    }
+
+    // RDU is Eastern Time — get YYYY-MM-DD for a given offset from today
+    function rduDateString(offsetDays = 0) {
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      const d = new Date(Date.now() + offsetDays * 86400000);
+      return fmt.format(d); // en-CA → YYYY-MM-DD
+    }
+
+    function selectedScheduledDate() {
+      const day = daySelect.value;
+      if (day === 'yesterday') return rduDateString(-1);
+      if (day === 'tomorrow') return rduDateString(1);
+      return rduDateString(0); // today
     }
 
     function statusClass(status, isDelayed) {
@@ -511,9 +539,10 @@
         return;
       }
 
+      // Cover yesterday through tomorrow so day filter works for delayed flights
       const now = Math.floor(Date.now() / 1000);
-      const from = now - 12 * 3600;
-      const to = now + 18 * 3600;
+      const from = now - 36 * 3600;
+      const to = now + 36 * 3600;
       const url = `${BASE}?scheduledTimestamp=${from}..${to}`;
 
       try {
@@ -564,10 +593,13 @@
       const terminal = terminalSelect.value;
       const updatedMins = parseInt(updatedSelect.value, 10) || 0;
       const sortBy = sortSelect.value || 'scheduled';
+      const targetDate = selectedScheduledDate();
       const q = searchInput.value.trim().toLowerCase();
       const nowSec = Math.floor(Date.now() / 1000);
 
       let filtered = allFlights.filter(f => {
+        // Day filter uses ORIGINAL scheduled date so delayed flights stay on their original day
+        if (f.scheduledDate !== targetDate) return false;
         if (scope === 'departure' && f.isArrival) return false;
         if (scope === 'arrival' && !f.isArrival) return false;
         if (airline && f.iataOperatingAirline !== airline) return false;
