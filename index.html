@@ -69,7 +69,7 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 22px;
       text-decoration: none;
       color: inherit;
     }
@@ -78,12 +78,10 @@
       height: 112px;
       border-radius: 26px;
       flex-shrink: 0;
-      box-shadow:
-        0 2px 4px rgba(15, 23, 42, 0.12),
-        0 8px 20px rgba(29, 78, 216, 0.35),
-        0 16px 32px rgba(15, 23, 42, 0.18);
+      box-shadow: none;
       overflow: hidden;
       display: block;
+      background: transparent;
     }
     .logo-badge img {
       width: 100%;
@@ -161,7 +159,10 @@
       .filters { grid-template-columns: repeat(3, 1fr); }
     }
     @media (min-width: 900px) {
-      .filters { grid-template-columns: repeat(6, 1fr); }
+      .filters { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (min-width: 1100px) {
+      .filters { grid-template-columns: repeat(7, 1fr); }
     }
     .filter-group label {
       display: block;
@@ -392,6 +393,14 @@
         </select>
       </div>
       <div class="filter-group">
+        <label for="progressFilter">Progress</label>
+        <select id="progressFilter">
+          <option value="">All flights</option>
+          <option value="upcoming">Yet to land / depart</option>
+          <option value="completed">Already landed / departed</option>
+        </select>
+      </div>
+      <div class="filter-group">
         <label for="sortFilter">Sort by</label>
         <select id="sortFilter">
           <option value="scheduled">Scheduled time</option>
@@ -452,6 +461,7 @@
     const airlineSelect = $('#airlineFilter');
     const terminalSelect = $('#terminalFilter');
     const updatedSelect = $('#updatedFilter');
+    const progressSelect = $('#progressFilter');
     const sortSelect = $('#sortFilter');
     const searchInput = $('#searchFilter');
 
@@ -477,7 +487,7 @@
         render();
       });
     });
-    [daySelect, airlineSelect, terminalSelect, updatedSelect, sortSelect].forEach(el => el.addEventListener('change', render));
+    [daySelect, airlineSelect, terminalSelect, updatedSelect, progressSelect, sortSelect].forEach(el => el.addEventListener('change', render));
     searchInput.addEventListener('input', debounce(render, 200));
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
 
@@ -624,10 +634,16 @@
       airlineSelect.value = current;
     }
 
+    function isCompleted(f) {
+      const s = (f.status || '').toLowerCase();
+      return s === 'landed' || s === 'departed' || s === 'arrived' || s === 'canceled' || s === 'cancelled';
+    }
+
     function render() {
       const airline = airlineSelect.value;
       const terminal = terminalSelect.value;
       const updatedMins = parseInt(updatedSelect.value, 10) || 0;
+      const progress = progressSelect.value;
       const sortBy = sortSelect.value || 'scheduled';
       const targetDate = selectedScheduledDate();
       const q = searchInput.value.trim().toLowerCase();
@@ -641,6 +657,8 @@
         if (airline && f.iataOperatingAirline !== airline) return false;
         if (terminal && f.terminal !== terminal) return false;
         if (updatedMins && (!f.lastUpdatedTimestamp || (nowSec - f.lastUpdatedTimestamp) > updatedMins * 60)) return false;
+        if (progress === 'upcoming' && isCompleted(f)) return false;
+        if (progress === 'completed' && !isCompleted(f)) return false;
         if (q) {
           const hay = [
             f.iataOperatingAirlineFlightNumber,
