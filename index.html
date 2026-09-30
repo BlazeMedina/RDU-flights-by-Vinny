@@ -78,7 +78,6 @@
       height: 112px;
       border-radius: 26px;
       flex-shrink: 0;
-      box-shadow: none;
       overflow: hidden;
       display: block;
       background: transparent;
@@ -88,12 +87,6 @@
       height: 100%;
       object-fit: cover;
       display: block;
-    }
-    .logo-text {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      line-height: 1.2;
     }
     .logo-text .title {
       font-weight: 700;
@@ -149,11 +142,32 @@
       color: var(--text);
       box-shadow: var(--shadow);
     }
+    /* Filter drawer */
+    .filter-drawer {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 40;
+    }
+    .filter-drawer-body {
+      overflow: hidden;
+      max-height: 340px;
+      transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease;
+      opacity: 1;
+      padding: 0 16px 4px;
+    }
+    .filter-drawer.collapsed .filter-drawer-body {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
     .filters {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-top: 12px;
+      padding-top: 10px;
+      padding-bottom: 8px;
     }
     @media (min-width: 640px) {
       .filters { grid-template-columns: repeat(3, 1fr); }
@@ -185,6 +199,45 @@
       outline: 2px solid var(--accent);
       outline-offset: -1px;
     }
+    .drawer-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 16px 10px;
+      border: none;
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .drawer-handle:hover { color: var(--text); }
+    .drawer-handle-bar {
+      width: 40px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .drawer-handle-icon {
+      font-size: 0.7rem;
+      line-height: 1;
+      transition: transform 0.25s ease;
+    }
+    .filter-drawer.collapsed .drawer-handle-icon {
+      transform: rotate(180deg);
+    }
+    .drawer-handle-label {
+      min-width: 5.5em;
+      text-align: center;
+    }
     .meta-bar {
       display: flex;
       flex-wrap: wrap;
@@ -207,22 +260,17 @@
       border-radius: var(--radius);
       padding: 12px 14px;
       margin-bottom: 8px;
-      box-shadow: var(--shadow);
       display: grid;
       grid-template-columns: auto 1fr auto;
-      gap: 8px 12px;
-      align-items: start;
-      transition: border-color .15s;
+      gap: 8px 16px;
+      align-items: center;
+      box-shadow: var(--shadow);
     }
-    .flight-card:hover { border-color: var(--accent); }
-    .time-col {
-      text-align: center;
-      min-width: 64px;
-    }
+    .time-col { text-align: left; min-width: 4.5rem; }
     .time-main {
+      font-size: 1.15rem;
       font-weight: 700;
-      font-size: 1.05rem;
-      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
     .time-sched {
       font-size: .75rem;
@@ -301,18 +349,6 @@
       margin-bottom: 8px;
       color: var(--text);
     }
-    .error-box ol { padding-left: 1.3em; margin-bottom: 12px; }
-    .error-box code {
-      background: var(--bg);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: .85em;
-    }
-    .error-box .hint {
-      font-size: .8rem;
-      color: var(--text-muted);
-      margin-top: 12px;
-    }
     footer {
       text-align: center;
       padding: 16px;
@@ -360,60 +396,71 @@
       <button class="tab" data-scope="departure">Departures</button>
       <button class="tab" data-scope="arrival">Arrivals</button>
     </div>
-    <div class="filters">
-      <div class="filter-group">
-        <label for="dayFilter">Day</label>
-        <select id="dayFilter">
-          <option value="yesterday">Yesterday</option>
-          <option value="today" selected>Today</option>
-          <option value="tomorrow">Tomorrow</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="airlineFilter">Airline</label>
-        <select id="airlineFilter"><option value="">All airlines</option></select>
-      </div>
-      <div class="filter-group">
-        <label for="terminalFilter">Terminal</label>
-        <select id="terminalFilter">
-          <option value="">All terminals</option>
-          <option value="1">Terminal 1</option>
-          <option value="2">Terminal 2</option>
-          <option value="unknown">Unknown / Other</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="updatedFilter">Updated</label>
-        <select id="updatedFilter">
-          <option value="">Any time</option>
-          <option value="5">Last 5 min</option>
-          <option value="15">Last 15 min</option>
-          <option value="30">Last 30 min</option>
-          <option value="60">Last hour</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="progressFilter">Progress</label>
-        <select id="progressFilter">
-          <option value="">All flights</option>
-          <option value="upcoming">Yet to land / depart</option>
-          <option value="completed">Already landed / departed</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="sortFilter">Sort by</label>
-        <select id="sortFilter">
-          <option value="scheduled">Scheduled time</option>
-          <option value="best">Best known time</option>
-          <option value="updated">Most recently updated</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="searchFilter">Search</label>
-        <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
+  </header>
+
+  <div class="filter-drawer" id="filterDrawer">
+    <div class="filter-drawer-body">
+      <div class="filters">
+        <div class="filter-group">
+          <label for="dayFilter">Day</label>
+          <select id="dayFilter">
+            <option value="yesterday">Yesterday</option>
+            <option value="today" selected>Today</option>
+            <option value="tomorrow">Tomorrow</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="airlineFilter">Airline</label>
+          <select id="airlineFilter"><option value="">All airlines</option></select>
+        </div>
+        <div class="filter-group">
+          <label for="terminalFilter">Terminal</label>
+          <select id="terminalFilter">
+            <option value="">All terminals</option>
+            <option value="1">Terminal 1</option>
+            <option value="2">Terminal 2</option>
+            <option value="unknown">Unknown / Other</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="updatedFilter">Updated</label>
+          <select id="updatedFilter">
+            <option value="">Any time</option>
+            <option value="5">Last 5 min</option>
+            <option value="15">Last 15 min</option>
+            <option value="30">Last 30 min</option>
+            <option value="60">Last hour</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="progressFilter">Progress</label>
+          <select id="progressFilter">
+            <option value="">All flights</option>
+            <option value="upcoming">Yet to land / depart</option>
+            <option value="completed">Already landed / departed</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="sortFilter">Sort by</label>
+          <select id="sortFilter">
+            <option value="scheduled">Scheduled time</option>
+            <option value="best">Best known time</option>
+            <option value="updated">Most recently updated</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="searchFilter">Search</label>
+          <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
+        </div>
       </div>
     </div>
-  </header>
+    <button type="button" class="drawer-handle" id="drawerHandle" aria-expanded="true" aria-controls="filterDrawer">
+      <span class="drawer-handle-bar" aria-hidden="true"></span>
+      <span class="drawer-handle-icon" aria-hidden="true">▲</span>
+      <span class="drawer-handle-label" id="drawerHandleLabel">Hide filters</span>
+      <span class="drawer-handle-bar" aria-hidden="true"></span>
+    </button>
+  </div>
 
   <div class="meta-bar">
     <span>Showing <span class="count" id="shownCount">0</span> of <span class="count" id="totalCount">0</span></span>
@@ -429,14 +476,9 @@
   </footer>
 
   <script>
-    // ★★★ PASTE YOUR CLOUDFLARE WORKER URL HERE ★★★
-    // Example: 'https://rdu-flights-proxy.yourname.workers.dev'
-    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev/';
-
-    // Do not change the line below
+    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev';
     const BASE = PROXY_URL.replace(/\/$/, '');
 
-    // RDU: Terminal 1 ≈ A gates, Terminal 2 ≈ C & D gates
     function deriveTerminal(gate) {
       if (!gate) return 'unknown';
       const g = String(gate).toUpperCase();
@@ -464,21 +506,24 @@
     const progressSelect = $('#progressFilter');
     const sortSelect = $('#sortFilter');
     const searchInput = $('#searchFilter');
+    const filterDrawer = $('#filterDrawer');
+    const drawerHandle = $('#drawerHandle');
+    const drawerHandleLabel = $('#drawerHandleLabel');
 
-    // ——— Theme ———
+    // Theme — dark is the default for new visitors
     const themeBtn = $('#themeBtn');
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       themeBtn.textContent = theme === 'dark' ? '☀' : '☾';
       localStorage.setItem('rdu-theme', theme);
     }
-    applyTheme(localStorage.getItem('rdu-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    applyTheme(localStorage.getItem('rdu-theme') || 'dark');
     themeBtn.addEventListener('click', () => {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       applyTheme(next);
     });
 
-    // ——— Tabs & filters ———
+    // Tabs & filters
     document.querySelectorAll('.tab').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -487,9 +532,40 @@
         render();
       });
     });
-    [daySelect, airlineSelect, terminalSelect, updatedSelect, progressSelect, sortSelect].forEach(el => el.addEventListener('change', render));
+    [daySelect, airlineSelect, terminalSelect, updatedSelect, progressSelect, sortSelect].forEach(el => {
+      el.addEventListener('change', render);
+    });
     searchInput.addEventListener('input', debounce(render, 200));
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
+
+    // Filter drawer open / close
+    function setDrawerCollapsed(collapsed) {
+      filterDrawer.classList.toggle('collapsed', collapsed);
+      drawerHandle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      drawerHandleLabel.textContent = collapsed ? 'Show filters' : 'Hide filters';
+      localStorage.setItem('rdu-drawer-collapsed', collapsed ? '1' : '0');
+    }
+    const preferCollapsed = localStorage.getItem('rdu-drawer-collapsed');
+    setDrawerCollapsed(
+      preferCollapsed === null
+        ? window.matchMedia('(max-width: 700px)').matches
+        : preferCollapsed === '1'
+    );
+    drawerHandle.addEventListener('click', () => {
+      setDrawerCollapsed(!filterDrawer.classList.contains('collapsed'));
+    });
+    let touchStartY = null;
+    drawerHandle.addEventListener('touchstart', (e) => {
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+    drawerHandle.addEventListener('touchend', (e) => {
+      if (touchStartY == null) return;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      touchStartY = null;
+      if (Math.abs(dy) < 24) return;
+      if (dy > 0) setDrawerCollapsed(true);
+      else setDrawerCollapsed(false);
+    }, { passive: true });
 
     function debounce(fn, ms) {
       let t;
@@ -510,7 +586,6 @@
       return formatTime(ts);
     }
 
-    // RDU is Eastern Time — get YYYY-MM-DD for a given offset from today
     function rduDateString(offsetDays = 0) {
       const fmt = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/New_York',
@@ -519,14 +594,14 @@
         day: '2-digit'
       });
       const d = new Date(Date.now() + offsetDays * 86400000);
-      return fmt.format(d); // en-CA → YYYY-MM-DD
+      return fmt.format(d);
     }
 
     function selectedScheduledDate() {
       const day = daySelect.value;
       if (day === 'yesterday') return rduDateString(-1);
       if (day === 'tomorrow') return rduDateString(1);
-      return rduDateString(0); // today
+      return rduDateString(0);
     }
 
     function statusClass(status, isDelayed) {
@@ -540,59 +615,25 @@
     }
 
     function statusLabel(f) {
-      if (f.isDelayed && !['Landed','Departed','Canceled'].includes(f.status)) return 'Delayed';
+      if (f.isDelayed && !['Landed', 'Departed', 'Canceled'].includes(f.status)) return 'Delayed';
       return f.status || '—';
     }
 
-    function showCorsHelp(errMsg) {
-      const isFile = location.protocol === 'file:';
-      listEl.innerHTML = `
-        <div class="error-box">
-          <h2>Could not load flight data</h2>
-          <p><strong>Reason:</strong> ${errMsg || 'Network or CORS error'}</p>
-          ${isFile ? `
-            <p>You opened this file directly (<code>file://</code>). Browsers block API calls from local files for security.</p>
-            <p><strong>Quick fix — run a local server:</strong></p>
-            <ol>
-              <li>Open a terminal in the folder that contains this file.</li>
-              <li>Run: <code>python3 -m http.server 8000</code></li>
-              <li>Open <code>http://localhost:8000/RDU-flights-by-Vinny.html</code> in your browser.</li>
-            </ol>
-          ` : `
-            <p>The RDU API does not allow requests from this origin (CORS). Serve this page from a local server or a static host.</p>
-            <p><strong>Easiest local option:</strong></p>
-            <ol>
-              <li>In the folder with this file run: <code>python3 -m http.server 8000</code></li>
-              <li>Visit <code>http://localhost:8000/RDU-flights-by-Vinny.html</code></li>
-            </ol>
-          `}
-          <p class="hint">Once it is served over <code>http://</code> or <code>https://</code>, the “Add to Home Screen” option will also work on phones.</p>
-          <p style="margin-top:12px"><button class="icon-btn" style="width:auto;padding:8px 16px" onclick="fetchFlights(true)">Try again</button></p>
-        </div>`;
+    function isCompleted(f) {
+      const s = (f.status || '').toLowerCase();
+      return s === 'landed' || s === 'departed' || s === 'arrived' || s === 'canceled' || s === 'cancelled';
     }
 
     async function fetchFlights(manual = false) {
       if (manual) listEl.innerHTML = '<div class="loading">Refreshing…</div>';
 
-      // Safety check – user still needs to paste their Worker URL
-      if (BASE.includes('YOUR-WORKER-NAME') || BASE.includes('YOUR-SUBDOMAIN')) {
-        listEl.innerHTML = `
-          <div class="error-box">
-            <h2>Proxy not configured yet</h2>
-            <p>Open this file and replace the <code>PROXY_URL</code> value near the top of the script with the URL of your Cloudflare Worker.</p>
-            <p>It should look something like:<br><code>https://rdu-flights-proxy.yourname.workers.dev</code></p>
-          </div>`;
-        return;
-      }
-
-      // Cover yesterday through tomorrow so day filter works for delayed flights
       const now = Math.floor(Date.now() / 1000);
       const from = now - 36 * 3600;
       const to = now + 36 * 3600;
-      const url = `${BASE}?scheduledTimestamp=${from}..${to}`;
+      const url = `${BASE}/flights?scheduledTimestamp=${from}..${to}`;
 
       try {
-        const res = await fetch(url);
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         if (json.status && json.status.code && json.status.code !== 200) {
@@ -615,10 +656,10 @@
         console.error(err);
         const msg = (err && err.message) || String(err);
         listEl.innerHTML = `
-          <div class="error-box">
+          <div class="error-box" style="padding:20px">
             <h2>Could not load flight data</h2>
             <p><strong>Reason:</strong> ${msg}</p>
-            <p>Check that your Cloudflare Worker is deployed and that the <code>PROXY_URL</code> in this file is correct.</p>
+            <p>Check that your Cloudflare Worker is deployed and reachable.</p>
             <p style="margin-top:12px">
               <button class="icon-btn" style="width:auto;padding:8px 16px" onclick="fetchFlights(true)">Try again</button>
             </p>
@@ -634,11 +675,6 @@
       airlineSelect.value = current;
     }
 
-    function isCompleted(f) {
-      const s = (f.status || '').toLowerCase();
-      return s === 'landed' || s === 'departed' || s === 'arrived' || s === 'canceled' || s === 'cancelled';
-    }
-
     function render() {
       const airline = airlineSelect.value;
       const terminal = terminalSelect.value;
@@ -650,7 +686,6 @@
       const nowSec = Math.floor(Date.now() / 1000);
 
       let filtered = allFlights.filter(f => {
-        // Day filter uses ORIGINAL scheduled date so delayed flights stay on their original day
         if (f.scheduledDate !== targetDate) return false;
         if (scope === 'departure' && f.isArrival) return false;
         if (scope === 'arrival' && !f.isArrival) return false;
@@ -674,17 +709,13 @@
         return true;
       });
 
-      // Sort
       filtered.sort((a, b) => {
         if (sortBy === 'updated') {
-          // Most recently updated first
           return (b.lastUpdatedTimestamp || 0) - (a.lastUpdatedTimestamp || 0);
         }
         if (sortBy === 'best') {
-          // Best known / estimated / actual time
           return (a.displayTime || 0) - (b.displayTime || 0);
         }
-        // Default: original scheduled time
         return (a.scheduledTimestamp || 0) - (b.scheduledTimestamp || 0);
       });
 
@@ -728,51 +759,28 @@
       }).join('');
     }
 
-    // ——— PWA / Add to Home Screen ———
+    // PWA install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       $('#installBanner').classList.add('show');
     });
-
     $('#installBanner').addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        alert('To add to Home Screen:\\n\\n• iPhone/iPad: Tap the Share button → “Add to Home Screen”\\n• Android: Use the browser menu → “Install app” or “Add to Home screen”');
-        return;
-      }
+      if (!deferredPrompt) return;
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') $('#installBanner').classList.remove('show');
       deferredPrompt = null;
     });
 
-    // Minimal service worker (only works when served over http/https)
-    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      const swCode = `
-        const CACHE = 'rdu-flights-v1';
-        self.addEventListener('install', e => {
-          e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-          self.skipWaiting();
-        });
-        self.addEventListener('activate', e => {
-          e.waitUntil(self.clients.claim());
-        });
-        self.addEventListener('fetch', e => {
-          if (e.request.url.includes('framna-rdu.cloud')) {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-            return;
-          }
-          e.respondWith(
-            caches.match(e.request).then(r => r || fetch(e.request))
-          );
-        });
-      `;
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swUrl).catch(() => {});
+    // Clear any old service workers / caches from later versions
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(() => {});
+    }
+    if (window.caches) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
     }
 
-    // Initial load + auto-refresh
     fetchFlights();
     setInterval(() => fetchFlights(false), 60_000);
     document.addEventListener('visibilitychange', () => {
