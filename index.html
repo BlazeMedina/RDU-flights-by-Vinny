@@ -656,11 +656,43 @@
       }
     }
 
+    // Common IATA codes → full airline names (RDU-focused + major carriers)
+    const AIRLINE_NAMES = {
+      AA: 'American Airlines', AS: 'Alaska Airlines', B6: 'JetBlue',
+      DL: 'Delta Air Lines', F9: 'Frontier', G4: 'Allegiant',
+      HA: 'Hawaiian Airlines', NK: 'Spirit', SY: 'Sun Country',
+      UA: 'United Airlines', WN: 'Southwest', MX: 'Breeze Airways',
+      '9E': 'Endeavor (Delta)', MQ: 'Envoy (American)', OH: 'PSA (American)',
+      OO: 'SkyWest', QX: 'Horizon', YX: 'Republic',
+      PT: 'Piedmont', YV: 'Mesa', CP: 'Compass',
+      C5: 'CommutAir', ZW: 'Air Wisconsin', G7: 'GoJet',
+      RV: 'Air Canada Rouge', AC: 'Air Canada', BA: 'British Airways',
+      LH: 'Lufthansa', AF: 'Air France', KL: 'KLM',
+      IB: 'Iberia', EK: 'Emirates', QR: 'Qatar Airways',
+      VS: 'Virgin Atlantic', LX: 'SWISS', EI: 'Aer Lingus',
+      PD: 'Porter', WS: 'WestJet', TS: 'Air Transat',
+      XP: 'Avelo', LF: 'Contour'
+    };
+
+    function airlineName(code) {
+      if (!code) return '';
+      const c = String(code).toUpperCase();
+      return AIRLINE_NAMES[c] || c;
+    }
+
+    function airlineLabel(code) {
+      if (!code) return '';
+      const c = String(code).toUpperCase();
+      const name = AIRLINE_NAMES[c];
+      return name ? `${name} (${c})` : c;
+    }
+
     function populateAirlines() {
       const current = airlineSelect.value;
-      const airlines = [...new Set(allFlights.map(f => f.iataOperatingAirline).filter(Boolean))].sort();
+      const airlines = [...new Set(allFlights.map(f => f.iataOperatingAirline).filter(Boolean))]
+        .sort((a, b) => airlineLabel(a).localeCompare(airlineLabel(b)));
       airlineSelect.innerHTML = '<option value="">All airlines</option>' +
-        airlines.map(a => `<option value="${a}">${a}</option>`).join('');
+        airlines.map(a => `<option value="${a}">${airlineLabel(a)}</option>`).join('');
       airlineSelect.value = current;
     }
 
@@ -688,7 +720,8 @@
             f.arrivalAirport,
             f.gate,
             f.status,
-            f.iataOperatingAirline
+            f.iataOperatingAirline,
+            airlineName(f.iataOperatingAirline)
           ].join(' ').toLowerCase();
           if (!hay.includes(q)) return false;
         }
@@ -731,7 +764,7 @@
             <div class="flight-info">
               <div class="route">${f.isArrival ? '←' : '→'} ${dest || '—'} · ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
               <div class="flight-meta">
-                <span>${f.iataOperatingAirline || ''}</span>
+                <span>${airlineLabel(f.iataOperatingAirline)}</span>
                 <span>${terminalLabel(f.terminal)}${f.gate ? ' · Gate ' + f.gate : ''}</span>
                 ${f.isArrival && f.baggageBelt?.length ? `<span>Bag ${f.baggageBelt.join(',')}</span>` : ''}
               </div>
