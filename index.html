@@ -142,12 +142,14 @@
       color: var(--text);
       box-shadow: var(--shadow);
     }
-    /* Filter drawer */
+    /* Filter drawer — sticky under header so the tab stays reachable while scrolling */
     .filter-drawer {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      position: relative;
-      z-index: 40;
+      position: sticky;
+      top: var(--header-h, 160px);
+      z-index: 49;
+      box-shadow: var(--shadow);
     }
     .filter-drawer-body {
       overflow: hidden;
@@ -528,11 +530,22 @@
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
 
     // Filter drawer open / close
+    function updateHeaderOffset() {
+      const header = document.querySelector('header');
+      if (header) {
+        document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+      }
+    }
+    updateHeaderOffset();
+    window.addEventListener('resize', updateHeaderOffset);
+
     function setDrawerCollapsed(collapsed) {
       filterDrawer.classList.toggle('collapsed', collapsed);
       drawerHandle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
       drawerHandleLabel.textContent = collapsed ? 'Show filters' : 'Hide filters';
       localStorage.setItem('rdu-drawer-collapsed', collapsed ? '1' : '0');
+      // Header height is stable; keep offset in sync after layout settles
+      requestAnimationFrame(updateHeaderOffset);
     }
     const preferCollapsed = localStorage.getItem('rdu-drawer-collapsed');
     setDrawerCollapsed(
@@ -671,7 +684,9 @@
       IB: 'Iberia', EK: 'Emirates', QR: 'Qatar Airways',
       VS: 'Virgin Atlantic', LX: 'SWISS', EI: 'Aer Lingus',
       PD: 'Porter', WS: 'WestJet', TS: 'Air Transat',
-      XP: 'Avelo', LF: 'Contour'
+      XP: 'Avelo', LF: 'Contour',
+      AM: 'Aeroméxico', '2T': 'BermudAir', CM: 'Copa Airlines',
+      FL: 'Icelandair', FI: 'Icelandair', Y4: 'Volaris'
     };
 
     function airlineName(code) {
