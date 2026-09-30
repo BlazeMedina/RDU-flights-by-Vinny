@@ -60,17 +60,12 @@
       box-shadow: var(--shadow);
     }
     .header-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+      position: relative;
       margin-bottom: 12px;
     }
     .logo {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      min-width: 0;
+      display: block;
+      width: 100%;
       text-decoration: none;
       color: inherit;
     }
@@ -88,19 +83,23 @@
       display: block;
     }
     .header-actions {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
       display: flex;
       gap: 8px;
-      align-items: flex-start;
-      flex-shrink: 0;
-      padding-top: 2px;
+      z-index: 2;
     }
     button, select, input {
       font: inherit;
       color: var(--text);
     }
     .icon-btn {
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border-radius: 8px;
       width: 40px;
       height: 40px;
@@ -111,7 +110,7 @@
       transition: background .15s;
       font-size: 1.1rem;
     }
-    .icon-btn:hover { background: var(--border); }
+    .icon-btn:hover { background: rgba(15, 23, 42, 0.75); }
     .icon-btn:active { transform: scale(.96); }
     .tabs {
       display: flex;
