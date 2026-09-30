@@ -382,7 +382,7 @@
     <div class="header-top">
       <div class="logo" aria-label="RDU flights by Vinny — Flight Status">
         <div class="logo-badge" aria-hidden="true">
-          <img src="hN7UD.jpg" alt="RDU flights by Vinny" width="112" height="112" />
+          <img id="logoBadgeImg" src="RDUbyVinny-night.jpg" alt="RDU flights by Vinny" width="112" height="112" />
         </div>
         <div class="logo-text">
           <div class="title">Flight Status</div>
@@ -503,10 +503,15 @@
 
     // Theme — dark is the default for new visitors
     const themeBtn = $('#themeBtn');
+    const logoBadgeImg = $('#logoBadgeImg');
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       themeBtn.textContent = theme === 'dark' ? '☀' : '☾';
       localStorage.setItem('rdu-theme', theme);
+      // Day badge in light mode, night badge in dark mode
+      if (logoBadgeImg) {
+        logoBadgeImg.src = theme === 'dark' ? 'RDUbyVinny-night.jpg' : 'RDUbyVinny-day.jpg';
+      }
     }
     applyTheme(localStorage.getItem('rdu-theme') || 'dark');
     themeBtn.addEventListener('click', () => {
