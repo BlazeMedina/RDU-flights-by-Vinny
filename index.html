@@ -680,10 +680,11 @@
       const now = Math.floor(Date.now() / 1000);
       const from = now - 36 * 3600;
       const to = now + 36 * 3600;
-      const url = `${BASE}?scheduledTimestamp=${from}..${to}`;
+      // Worker forwards any path; /flights keeps the URL clear and cache-busted
+      const url = `${BASE}/flights?scheduledTimestamp=${from}..${to}&_=${now}`;
 
       try {
-        const res = await fetch(url);
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         if (json.status && json.status.code && json.status.code !== 200) {
@@ -867,30 +868,15 @@
       deferredPrompt = null;
     });
 
-    // Minimal service worker (only works when served over http/https)
+    // Lightweight SW for offline shell only — never cache live flight API / worker
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      const swCode = `
-        const CACHE = 'rdu-flights-v1';
-        self.addEventListener('install', e => {
-          e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-          self.skipWaiting();
-        });
-        self.addEventListener('activate', e => {
-          e.waitUntil(self.clients.claim());
-        });
-        self.addEventListener('fetch', e => {
-          if (e.request.url.includes('framna-rdu.cloud')) {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-            return;
-          }
-          e.respondWith(
-            caches.match(e.request).then(r => r || fetch(e.request))
-          );
-        });
-      `;
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swUrl).catch(() => {});
+      // Drop any older SW that was cache-first (it could keep a stale HTML with bad PROXY_URL)
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      }).catch(() => {});
+      if (window.caches) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
+      }
     }
 
     // Initial load + auto-refresh
