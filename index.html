@@ -149,38 +149,20 @@
       color: var(--text);
       box-shadow: var(--shadow);
     }
-    /* —— Filter drawer —— */
-    .filter-drawer {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      z-index: 40;
-    }
-    .filter-drawer-body {
-      overflow: hidden;
-      max-height: 320px;
-      transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease;
-      opacity: 1;
-      padding: 0 16px 4px;
-    }
-    .filter-drawer.collapsed .filter-drawer-body {
-      max-height: 0;
-      opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
     .filters {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      padding-top: 10px;
-      padding-bottom: 8px;
+      margin-top: 12px;
     }
     @media (min-width: 640px) {
       .filters { grid-template-columns: repeat(3, 1fr); }
     }
     @media (min-width: 900px) {
-      .filters { grid-template-columns: repeat(6, 1fr); }
+      .filters { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (min-width: 1100px) {
+      .filters { grid-template-columns: repeat(7, 1fr); }
     }
     .filter-group label {
       display: block;
@@ -202,45 +184,6 @@
     select:focus, input:focus {
       outline: 2px solid var(--accent);
       outline-offset: -1px;
-    }
-    .drawer-handle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 8px 16px 10px;
-      border: none;
-      background: var(--surface);
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: .75rem;
-      font-weight: 600;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      touch-action: manipulation;
-    }
-    .drawer-handle:hover { color: var(--text); }
-    .drawer-handle-bar {
-      width: 40px;
-      height: 4px;
-      border-radius: 999px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-    .drawer-handle-icon {
-      font-size: 0.7rem;
-      line-height: 1;
-      transition: transform 0.25s ease;
-    }
-    .filter-drawer.collapsed .drawer-handle-icon {
-      transform: rotate(180deg);
-    }
-    .drawer-handle-label {
-      min-width: 4.5em;
-      text-align: center;
     }
     .meta-bar {
       display: flex;
@@ -417,61 +360,60 @@
       <button class="tab" data-scope="departure">Departures</button>
       <button class="tab" data-scope="arrival">Arrivals</button>
     </div>
-  </header>
-
-  <div class="filter-drawer" id="filterDrawer">
-    <div class="filter-drawer-body">
-      <div class="filters">
-        <div class="filter-group">
-          <label for="dayFilter">Day</label>
-          <select id="dayFilter">
-            <option value="yesterday">Yesterday</option>
-            <option value="today" selected>Today</option>
-            <option value="tomorrow">Tomorrow</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="airlineFilter">Airline</label>
-          <select id="airlineFilter"><option value="">All airlines</option></select>
-        </div>
-        <div class="filter-group">
-          <label for="terminalFilter">Terminal</label>
-          <select id="terminalFilter">
-            <option value="">All terminals</option>
-            <option value="1">Terminal 1</option>
-            <option value="2">Terminal 2</option>
-            <option value="unknown">Unknown / Other</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="progressFilter">Progress</label>
-          <select id="progressFilter">
-            <option value="">All flights</option>
-            <option value="upcoming">Pending flights</option>
-            <option value="completed">Completed flights</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="sortFilter">Sort by</label>
-          <select id="sortFilter">
-            <option value="scheduled">Scheduled time</option>
-            <option value="best">Updated time</option>
-            <option value="updated">Most recently updated</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="searchFilter">Search</label>
-          <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
-        </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label for="dayFilter">Day</label>
+        <select id="dayFilter">
+          <option value="yesterday">Yesterday</option>
+          <option value="today" selected>Today</option>
+          <option value="tomorrow">Tomorrow</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="airlineFilter">Airline</label>
+        <select id="airlineFilter"><option value="">All airlines</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="terminalFilter">Terminal</label>
+        <select id="terminalFilter">
+          <option value="">All terminals</option>
+          <option value="1">Terminal 1</option>
+          <option value="2">Terminal 2</option>
+          <option value="unknown">Unknown / Other</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="updatedFilter">Updated</label>
+        <select id="updatedFilter">
+          <option value="">Any time</option>
+          <option value="5">Last 5 min</option>
+          <option value="15">Last 15 min</option>
+          <option value="30">Last 30 min</option>
+          <option value="60">Last hour</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="progressFilter">Progress</label>
+        <select id="progressFilter">
+          <option value="">All flights</option>
+          <option value="upcoming">Yet to land / depart</option>
+          <option value="completed">Already landed / departed</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="sortFilter">Sort by</label>
+        <select id="sortFilter">
+          <option value="scheduled">Scheduled time</option>
+          <option value="best">Best known time</option>
+          <option value="updated">Most recently updated</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="searchFilter">Search</label>
+        <input type="search" id="searchFilter" placeholder="Flight, city, gate…" />
       </div>
     </div>
-    <button type="button" class="drawer-handle" id="drawerHandle" aria-expanded="true" aria-controls="filterDrawer">
-      <span class="drawer-handle-bar" aria-hidden="true"></span>
-      <span class="drawer-handle-icon" aria-hidden="true">▲</span>
-      <span class="drawer-handle-label" id="drawerHandleLabel">Hide filters</span>
-      <span class="drawer-handle-bar" aria-hidden="true"></span>
-    </button>
-  </div>
+  </header>
 
   <div class="meta-bar">
     <span>Showing <span class="count" id="shownCount">0</span> of <span class="count" id="totalCount">0</span></span>
@@ -489,7 +431,7 @@
   <script>
     // ★★★ PASTE YOUR CLOUDFLARE WORKER URL HERE ★★★
     // Example: 'https://rdu-flights-proxy.yourname.workers.dev'
-    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev';
+    const PROXY_URL = 'https://rdu-flights-proxy.n-v-medina-1104.workers.dev/';
 
     // Do not change the line below
     const BASE = PROXY_URL.replace(/\/$/, '');
@@ -518,12 +460,10 @@
     const daySelect = $('#dayFilter');
     const airlineSelect = $('#airlineFilter');
     const terminalSelect = $('#terminalFilter');
+    const updatedSelect = $('#updatedFilter');
     const progressSelect = $('#progressFilter');
     const sortSelect = $('#sortFilter');
     const searchInput = $('#searchFilter');
-    const filterDrawer = $('#filterDrawer');
-    const drawerHandle = $('#drawerHandle');
-    const drawerHandleLabel = $('#drawerHandleLabel');
 
     // ——— Theme ———
     const themeBtn = $('#themeBtn');
@@ -547,40 +487,9 @@
         render();
       });
     });
-    [daySelect, airlineSelect, terminalSelect, progressSelect, sortSelect].forEach(el => el.addEventListener('change', render));
+    [daySelect, airlineSelect, terminalSelect, updatedSelect, progressSelect, sortSelect].forEach(el => el.addEventListener('change', render));
     searchInput.addEventListener('input', debounce(render, 200));
     $('#refreshBtn').addEventListener('click', () => fetchFlights(true));
-
-    // ——— Filter drawer open / close ———
-    function setDrawerCollapsed(collapsed) {
-      filterDrawer.classList.toggle('collapsed', collapsed);
-      drawerHandle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-      drawerHandleLabel.textContent = collapsed ? 'Show filters' : 'Hide filters';
-      localStorage.setItem('rdu-drawer-collapsed', collapsed ? '1' : '0');
-    }
-    // Default collapsed on small screens so flight list gets more space
-    const preferCollapsed = localStorage.getItem('rdu-drawer-collapsed');
-    setDrawerCollapsed(
-      preferCollapsed === null
-        ? window.matchMedia('(max-width: 700px)').matches
-        : preferCollapsed === '1'
-    );
-    drawerHandle.addEventListener('click', () => {
-      setDrawerCollapsed(!filterDrawer.classList.contains('collapsed'));
-    });
-    // Simple swipe on handle: swipe up = open, swipe down = close
-    let touchStartY = null;
-    drawerHandle.addEventListener('touchstart', (e) => {
-      touchStartY = e.changedTouches[0].clientY;
-    }, { passive: true });
-    drawerHandle.addEventListener('touchend', (e) => {
-      if (touchStartY == null) return;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      touchStartY = null;
-      if (Math.abs(dy) < 24) return;
-      if (dy > 0) setDrawerCollapsed(true);   // swipe down → hide
-      else setDrawerCollapsed(false);          // swipe up → show
-    }, { passive: true });
 
     function debounce(fn, ms) {
       let t;
@@ -680,11 +589,10 @@
       const now = Math.floor(Date.now() / 1000);
       const from = now - 36 * 3600;
       const to = now + 36 * 3600;
-      // Worker forwards any path; /flights keeps the URL clear and cache-busted
-      const url = `${BASE}/flights?scheduledTimestamp=${from}..${to}&_=${now}`;
+      const url = `${BASE}?scheduledTimestamp=${from}..${to}`;
 
       try {
-        const res = await fetch(url, { cache: 'no-store' });
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         if (json.status && json.status.code && json.status.code !== 200) {
@@ -718,43 +626,11 @@
       }
     }
 
-    // Common IATA codes → full airline names (RDU-focused + major carriers)
-    const AIRLINE_NAMES = {
-      AA: 'American Airlines', AS: 'Alaska Airlines', B6: 'JetBlue',
-      DL: 'Delta Air Lines', F9: 'Frontier', G4: 'Allegiant',
-      HA: 'Hawaiian Airlines', NK: 'Spirit', SY: 'Sun Country',
-      UA: 'United Airlines', WN: 'Southwest', MX: 'Breeze Airways',
-      9E: 'Endeavor (Delta)', MQ: 'Envoy (American)', OH: 'PSA (American)',
-      OO: 'SkyWest', QX: 'Horizon', YX: 'Republic',
-      PT: 'Piedmont', YV: 'Mesa', CP: 'Compass',
-      C5: 'CommutAir', ZW: 'Air Wisconsin', G7: 'GoJet',
-      RV: 'Air Canada Rouge', AC: 'Air Canada', BA: 'British Airways',
-      LH: 'Lufthansa', AF: 'Air France', KL: 'KLM',
-      IB: 'Iberia', EK: 'Emirates', QR: 'Qatar Airways',
-      VS: 'Virgin Atlantic', LX: 'SWISS', EI: 'Aer Lingus',
-      PD: 'Porter', WS: 'WestJet', TS: 'Air Transat',
-      XP: 'Avelo', MX: 'Breeze Airways', LF: 'Contour'
-    };
-
-    function airlineName(code) {
-      if (!code) return '';
-      const c = String(code).toUpperCase();
-      return AIRLINE_NAMES[c] || c;
-    }
-
-    function airlineLabel(code) {
-      if (!code) return '';
-      const c = String(code).toUpperCase();
-      const name = AIRLINE_NAMES[c];
-      return name ? `${name} (${c})` : c;
-    }
-
     function populateAirlines() {
       const current = airlineSelect.value;
-      const airlines = [...new Set(allFlights.map(f => f.iataOperatingAirline).filter(Boolean))]
-        .sort((a, b) => airlineLabel(a).localeCompare(airlineLabel(b)));
+      const airlines = [...new Set(allFlights.map(f => f.iataOperatingAirline).filter(Boolean))].sort();
       airlineSelect.innerHTML = '<option value="">All airlines</option>' +
-        airlines.map(a => `<option value="${a}">${airlineLabel(a)}</option>`).join('');
+        airlines.map(a => `<option value="${a}">${a}</option>`).join('');
       airlineSelect.value = current;
     }
 
@@ -766,10 +642,12 @@
     function render() {
       const airline = airlineSelect.value;
       const terminal = terminalSelect.value;
+      const updatedMins = parseInt(updatedSelect.value, 10) || 0;
       const progress = progressSelect.value;
       const sortBy = sortSelect.value || 'scheduled';
       const targetDate = selectedScheduledDate();
       const q = searchInput.value.trim().toLowerCase();
+      const nowSec = Math.floor(Date.now() / 1000);
 
       let filtered = allFlights.filter(f => {
         // Day filter uses ORIGINAL scheduled date so delayed flights stay on their original day
@@ -778,6 +656,7 @@
         if (scope === 'arrival' && !f.isArrival) return false;
         if (airline && f.iataOperatingAirline !== airline) return false;
         if (terminal && f.terminal !== terminal) return false;
+        if (updatedMins && (!f.lastUpdatedTimestamp || (nowSec - f.lastUpdatedTimestamp) > updatedMins * 60)) return false;
         if (progress === 'upcoming' && isCompleted(f)) return false;
         if (progress === 'completed' && !isCompleted(f)) return false;
         if (q) {
@@ -788,8 +667,7 @@
             f.arrivalAirport,
             f.gate,
             f.status,
-            f.iataOperatingAirline,
-            airlineName(f.iataOperatingAirline)
+            f.iataOperatingAirline
           ].join(' ').toLowerCase();
           if (!hay.includes(q)) return false;
         }
@@ -803,7 +681,7 @@
           return (b.lastUpdatedTimestamp || 0) - (a.lastUpdatedTimestamp || 0);
         }
         if (sortBy === 'best') {
-          // Updated / estimated / actual time
+          // Best known / estimated / actual time
           return (a.displayTime || 0) - (b.displayTime || 0);
         }
         // Default: original scheduled time
@@ -836,7 +714,7 @@
             <div class="flight-info">
               <div class="route">${f.isArrival ? '←' : '→'} ${dest || '—'} · ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
               <div class="flight-meta">
-                <span>${airlineLabel(f.iataOperatingAirline)}</span>
+                <span>${f.iataOperatingAirline || ''}</span>
                 <span>${terminalLabel(f.terminal)}${f.gate ? ' · Gate ' + f.gate : ''}</span>
                 ${f.isArrival && f.baggageBelt?.length ? `<span>Bag ${f.baggageBelt.join(',')}</span>` : ''}
               </div>
@@ -868,15 +746,30 @@
       deferredPrompt = null;
     });
 
-    // Lightweight SW for offline shell only — never cache live flight API / worker
+    // Minimal service worker (only works when served over http/https)
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      // Drop any older SW that was cache-first (it could keep a stale HTML with bad PROXY_URL)
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        regs.forEach(r => r.unregister());
-      }).catch(() => {});
-      if (window.caches) {
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
-      }
+      const swCode = `
+        const CACHE = 'rdu-flights-v1';
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(self.clients.claim());
+        });
+        self.addEventListener('fetch', e => {
+          if (e.request.url.includes('framna-rdu.cloud')) {
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+            return;
+          }
+          e.respondWith(
+            caches.match(e.request).then(r => r || fetch(e.request))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
     }
 
     // Initial load + auto-refresh
