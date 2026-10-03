@@ -293,8 +293,18 @@
       color: var(--text-muted);
       margin-top: 2px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    .flight-meta .meta-airline {
+      line-height: 1.25;
+    }
+    .flight-meta .meta-airport {
+      line-height: 1.25;
+    }
+    .flight-meta .meta-extra {
+      line-height: 1.25;
     }
     .status-col {
       text-align: right;
@@ -829,9 +839,9 @@
             <div class="flight-info">
               <div class="route">${f.isArrival ? '←' : '→'} ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
               <div class="flight-meta">
-                <span>${airlineLabel(f.iataOperatingAirline)}</span>
-                <span>${airportLabel(dest)}</span>
-                ${f.isArrival && f.baggageBelt?.length ? `<span>Bag ${f.baggageBelt.join(',')}</span>` : ''}
+                <span class="meta-airline">${airlineLabel(f.iataOperatingAirline)}</span>
+                <span class="meta-airport">${airportLabel(dest)}</span>
+                ${f.isArrival && f.baggageBelt?.length ? `<span class="meta-extra">Bag ${f.baggageBelt.join(',')}</span>` : ''}
               </div>
             </div>
             <div class="status-col">
