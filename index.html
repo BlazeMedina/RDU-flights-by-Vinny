@@ -317,10 +317,22 @@
     .badge-landed, .badge-departed { background: color-mix(in srgb, var(--info) 18%, transparent); color: var(--info); }
     .badge-delayed { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
     .badge-canceled { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
-    .gate {
+    .gate-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 0.4em;
       font-size: .8rem;
-      font-weight: 600;
+    }
+    .gate-row .terminal-tag {
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .gate-row .gate {
+      font-weight: 700;
       color: var(--text);
+      white-space: nowrap;
     }
     .empty, .loading, .error-box {
       text-align: center;
@@ -475,7 +487,37 @@
     function terminalLabel(t) {
       if (t === '1') return 'T1';
       if (t === '2') return 'T2';
-      return '—';
+      return '';
+    }
+
+    // Common airport codes → city names (for flight cards)
+    const AIRPORT_CITIES = {
+      RDU: 'Raleigh/Durham', ATL: 'Atlanta', CLT: 'Charlotte', ORD: 'Chicago',
+      MDW: 'Chicago', DFW: 'Dallas/Fort Worth', DAL: 'Dallas', DEN: 'Denver',
+      DTW: 'Detroit', FLL: 'Fort Lauderdale', BWI: 'Baltimore', BOS: 'Boston',
+      JFK: 'New York', LGA: 'New York', EWR: 'Newark', MIA: 'Miami',
+      MCO: 'Orlando', TPA: 'Tampa', PHL: 'Philadelphia', PIT: 'Pittsburgh',
+      IAD: 'Washington', DCA: 'Washington', SEA: 'Seattle', SFO: 'San Francisco',
+      LAX: 'Los Angeles', LAS: 'Las Vegas', PHX: 'Phoenix', MSP: 'Minneapolis',
+      IAH: 'Houston', HOU: 'Houston', SLC: 'Salt Lake City', SAN: 'San Diego',
+      AUS: 'Austin', BNA: 'Nashville', IND: 'Indianapolis', CMH: 'Columbus',
+      CVG: 'Cincinnati', CLE: 'Cleveland', STL: 'St. Louis', MCI: 'Kansas City',
+      MSY: 'New Orleans', JAX: 'Jacksonville', RSW: 'Fort Myers', PBI: 'West Palm Beach',
+      CHS: 'Charleston', SAV: 'Savannah', GSO: 'Greensboro', ILM: 'Wilmington',
+      MYR: 'Myrtle Beach', ORF: 'Norfolk', RIC: 'Richmond', ROA: 'Roanoke',
+      AVL: 'Asheville', TYS: 'Knoxville', MEM: 'Memphis', SDF: 'Louisville',
+      BHM: 'Birmingham', PNS: 'Pensacola', VPS: 'Destin', ECP: 'Panama City',
+      YYZ: 'Toronto', YUL: 'Montreal', YOW: 'Ottawa', CUN: 'Cancún',
+      MEX: 'Mexico City', SJU: 'San Juan', NAS: 'Nassau', BDA: 'Bermuda',
+      LHR: 'London', CDG: 'Paris', FRA: 'Frankfurt', AMS: 'Amsterdam',
+      DUB: 'Dublin', KEF: 'Reykjavík', PTY: 'Panama City'
+    };
+
+    function airportLabel(code) {
+      if (!code) return '—';
+      const c = String(code).toUpperCase();
+      const city = AIRPORT_CITIES[c];
+      return city ? `${city} (${c})` : c;
     }
 
     let allFlights = [];
@@ -730,6 +772,7 @@
         if (progress === 'upcoming' && isCompleted(f)) return false;
         if (progress === 'completed' && !isCompleted(f)) return false;
         if (q) {
+          const destCode = f.isArrival ? f.departureAirport : f.arrivalAirport;
           const hay = [
             f.iataOperatingAirlineFlightNumber,
             f.codeShareFlightNumber,
@@ -738,7 +781,8 @@
             f.gate,
             f.status,
             f.iataOperatingAirline,
-            airlineName(f.iataOperatingAirline)
+            airlineName(f.iataOperatingAirline),
+            airportLabel(destCode)
           ].join(' ').toLowerCase();
           if (!hay.includes(q)) return false;
         }
@@ -770,6 +814,10 @@
         const showCorrection = best && sched && best !== sched;
         const badgeCls = statusClass(f.status, f.isDelayed);
         const label = statusLabel(f);
+        const term = terminalLabel(f.terminal);
+        const gateHtml = (term || f.gate)
+          ? `<div class="gate-row">${term ? `<span class="terminal-tag">${term}</span>` : ''}${f.gate ? `<span class="gate">${f.gate}</span>` : ''}</div>`
+          : '';
 
         return `
           <article class="flight-card">
@@ -779,16 +827,16 @@
               <div class="time-updated" title="Last updated">${formatRelative(f.lastUpdatedTimestamp)}</div>
             </div>
             <div class="flight-info">
-              <div class="route">${f.isArrival ? '←' : '→'} ${dest || '—'} · ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
+              <div class="route">${f.isArrival ? '←' : '→'} ${f.iataOperatingAirlineFlightNumber || f.codeShareFlightNumber || '—'}</div>
               <div class="flight-meta">
                 <span>${airlineLabel(f.iataOperatingAirline)}</span>
-                <span>${terminalLabel(f.terminal)}${f.gate ? ' · Gate ' + f.gate : ''}</span>
+                <span>${airportLabel(dest)}</span>
                 ${f.isArrival && f.baggageBelt?.length ? `<span>Bag ${f.baggageBelt.join(',')}</span>` : ''}
               </div>
             </div>
             <div class="status-col">
               <span class="badge ${badgeCls}">${label}</span>
-              ${f.gate ? `<span class="gate">${f.gate}</span>` : ''}
+              ${gateHtml}
             </div>
           </article>
         `;
